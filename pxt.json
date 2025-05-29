@@ -12,7 +12,8 @@
         "main.ts",
         "_locales/zh-cn/Tinybit-strings.json",
         "_locales/zh-tw/Tinybit-strings.json",
-        "_locales/fr/Tinybit-strings.json"
+        "_locales/fr/Tinybit-strings.json",
+        "_locales/ro/Tinybit-strings.json"
     ],
     "testFiles": [
         "test.ts"

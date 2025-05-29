@@ -161,8 +161,34 @@ namespace TinyBit_Pro {
         pins.i2cWriteBuffer(PWM_ADD, buf);
     }
 
-    let car_flag_old = 0; //0: Both motors forward, 1: Both motors reverse, 2: Left turn, 3: Right turn
-    let car_flag_new = 0; //0: Both motors forward, 1: Both motors reverse, 2: Left turn, 3: Right turn
+    // car_flag_old and car_flag_new are used to track motor state transitions.
+    // This helps implement a motor protection mechanism: if the car changes its primary direction of movement
+    // (e.g., from forward to backward, or forward to spin), the motors are briefly stopped.
+    // car_flag states:
+    // 0: Both motors potentially moving forward (includes forward, left turn, right turn from setPwmMotor modes 1, 3, 4 and controlMotors sp_L>=0, sp_R>=0)
+    // 1: Both motors potentially moving backward (includes backward from setPwmMotor mode 2 and controlMotors sp_L<0, sp_R<0)
+    // 2: Spin left (motor 1 reverse, motor 2 forward from setPwmMotor mode 5 or controlMotors sp_L>0, sp_R<0)
+    // 3: Spin right (motor 1 forward, motor 2 reverse from setPwmMotor mode 6 or controlMotors sp_L<0, sp_R>0)
+    // Note: 'stop' (mode 0 in setPwmMotor) doesn't explicitly set a car_flag_new but implies motors are halted.
+    let car_flag_old = 0; 
+    let car_flag_new = 0; 
+
+    /**
+     * Low-level function to control motors via I2C PWM driver based on predefined modes.
+     * It directly sets motor speeds and directions according to the specified mode.
+     * Includes a protection mechanism that briefly stops motors if the state changes significantly.
+     * Mode mapping:
+     * 0: Stop - All motors off.
+     * 1: Run - Both motors forward (speed1 for left, speed2 for right). car_flag_new = 0.
+     * 2: Back - Both motors reverse (speed1 for left, speed2 for right). car_flag_new = 1.
+     * 3: Left - Left motor off, Right motor forward (speed2). car_flag_new = 0.
+     * 4: Right - Right motor off, Left motor forward (speed1). car_flag_new = 0.
+     * 5: Spin Left (tleft) - Left motor reverse (speed1), Right motor forward (speed2). car_flag_new = 2.
+     * 6: Spin Right (tright) - Left motor forward (speed1), Right motor reverse (speed2). car_flag_new = 3.
+     * @param mode The operational mode for the motors.
+     * @param speed1 Speed for the first motor (typically left).
+     * @param speed2 Speed for the second motor (typically right).
+     */
     function setPwmMotor(mode: number, speed1: number, speed2: number): void {
         if (mode < 0 || mode > 6)
             return;
@@ -370,6 +396,18 @@ namespace TinyBit_Pro {
     //% sp_L.min=-255 sp_L.max=255  sp_R.min=-255 sp_R.max=255
     //% blockGap=10
     //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    /**
+     * Provides direct control over left and right motor speeds, allowing forward and reverse movement.
+     * This function translates the left (sp_L) and right (sp_R) speed inputs into I2C commands
+     * for the motor driver. It also utilizes the car_flag_new and car_flag_old variables
+     * to implement a motor protection mechanism, briefly stopping the motors if the overall
+     * direction of movement changes significantly (e.g., from forward to reverse or to a spin).
+     * car_flag_new states set by this function:
+     *   0: Forward, or one motor forward and other stopped/slower (e.g. turning). (sp_L>=0 && sp_R>=0)
+     *   1: Reverse (both motors backward). (sp_L<0 && sp_R<0)
+     *   2: Spin Left (left motor forward, right motor backward). (sp_L>0 && sp_R<0)
+     *   3: Spin Right (left motor backward, right motor forward). (sp_L<0 && sp_R>0)
+     */
     export function controlMotors(sp_L:number,sp_R:number)
     {
         let buf = pins.createBuffer(5);
@@ -755,7 +793,6 @@ namespace TinyBit_Pro {
                 const br_ease = k > mid
                     ? Math.idiv(255 * (this._length - 1 - k) * (this._length - 1 - k), (mid * mid))
                     : Math.idiv(255 * k * k, (mid * mid));
-                //serial.writeLine(k + ":" + br_ease); // Assuming serial might not be available or desired here
                 const r = (buf[ledoffset + 0] * br_ease) >> 8; buf[ledoffset + 0] = r;
                 const g = (buf[ledoffset + 1] * br_ease) >> 8; buf[ledoffset + 1] = g;
                 const b = (buf[ledoffset + 2] * br_ease) >> 8; buf[ledoffset + 2] = b;
