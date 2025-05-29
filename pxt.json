@@ -1,7 +1,8 @@
 {
     "name": "TinyBit-Pro",
     "version": "2.0.4 Pro 01",
-    "description": "An enhanced version of the TinyBit extension with additional features and improvements. Made for personal tests by 0vi. NeoPixel is also Included, here you can find a demo : https://github.com/0vidiuS/TinyBit2Backup/blob/main/test.ts ",
+    "description": "An enhanced version of the TinyBit extension with additional features and improvements. 0. ",
+    //                                                                                           -------------------
     "license": "MIT",
     "dependencies": {
         "core": "*",
