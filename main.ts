@@ -1,10 +1,3 @@
-/*
-Copyright (C): 2010-2019, Shenzhen Yahboom Tech
-modified from liusen
-load dependency
-"TinyBit-Pro": "file:../pxt-Tinybit"
-*/
-
 //% color="#006400" weight=20 icon="\uf1b9"
 namespace TinyBit_Pro {
 
