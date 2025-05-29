@@ -1,7 +1,11 @@
 # TinyBit-Pro MakeCode Extension
 
 TinyBit-Pro is an enhanced version of the original TinyBit extension, offering new features...
-Extension for Yahboom Tiny:bit V2.0.3
+BaSED on Extension for Yahboom Tiny:bit V2.0.3
+
+An enhanced version of the TinyBit extension with additional features and improvements.
+Made for personal tests by 0vi. NeoPixel is also Included,
+here you can find a demo : https://github.com/0vidiuS/TinyBit2Backup/blob/main/test.ts
 
 ## License
 
