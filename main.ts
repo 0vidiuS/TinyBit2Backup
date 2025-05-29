@@ -1,5 +1,5 @@
 //% color="#006400" weight=20 icon="\uf1b9"
-namespace TinyBit_Pro222 {
+namespace TinyBit_Pro {
 
     const PWM_ADD = 0x01
     const MOTOR = 0x02
